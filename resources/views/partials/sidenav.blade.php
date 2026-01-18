@@ -34,6 +34,12 @@
                     <span class="menu-text"> Featured Projects </span>
                 </a>
             </li>
+            <li class="side-nav-item">
+                <a href="{{ route('clients.index') }}" class="side-nav-link">
+                    <span class="menu-icon"><i class="ri-image-line"></i></span>
+                    <span class="menu-text"> Clients </span>
+                </a>
+            </li>
         </ul>
     </div>
 </div>
