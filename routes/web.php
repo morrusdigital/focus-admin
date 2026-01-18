@@ -1,10 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\FeaturedProjectController;
 
 Route::get('/', function () {
-    return view('dashboard', [
-        'title' => 'Dashboard',
-        'subtitle' => 'Dashboard',
-    ]);
-})->name('dashboard');
+    return redirect()->route('featured-projects.index');
+});
+
+Route::resource('featured-projects', FeaturedProjectController::class);
