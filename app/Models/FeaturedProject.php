@@ -11,6 +11,10 @@ class FeaturedProject extends Model
 {
     use HasFactory;
 
+    protected $appends = [
+        'image_url',
+    ];
+
     protected $fillable = [
         'title',
         'scope',
