@@ -40,6 +40,12 @@
                     <span class="menu-text"> Clients </span>
                 </a>
             </li>
+            <li class="side-nav-item">
+                <a href="{{ route('users.index') }}" class="side-nav-link">
+                    <span class="menu-icon"><i class="ri-user-3-line"></i></span>
+                    <span class="menu-text"> Users </span>
+                </a>
+            </li>
         </ul>
     </div>
 </div>
