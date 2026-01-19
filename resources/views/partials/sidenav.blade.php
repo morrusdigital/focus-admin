@@ -47,6 +47,18 @@
                 </a>
             </li>
             <li class="side-nav-item">
+                <a href="{{ route('company-profile-downloads.index') }}" class="side-nav-link">
+                    <span class="menu-icon"><i class="ri-download-cloud-2-line"></i></span>
+                    <span class="menu-text"> Compro Downloads </span>
+                </a>
+            </li>
+            <li class="side-nav-item">
+                <a href="{{ route('company-profile.edit') }}" class="side-nav-link">
+                    <span class="menu-icon"><i class="ri-file-pdf-2-line"></i></span>
+                    <span class="menu-text"> Company Profile File </span>
+                </a>
+            </li>
+            <li class="side-nav-item">
                 <a href="{{ route('news.index') }}" class="side-nav-link">
                     <span class="menu-icon"><i class="ri-article-line"></i></span>
                     <span class="menu-text"> News </span>
