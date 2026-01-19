@@ -41,6 +41,12 @@
                 </a>
             </li>
             <li class="side-nav-item">
+                <a href="{{ route('project-requests.index') }}" class="side-nav-link">
+                    <span class="menu-icon"><i class="ri-inbox-archive-line"></i></span>
+                    <span class="menu-text"> Project Requests </span>
+                </a>
+            </li>
+            <li class="side-nav-item">
                 <a href="{{ route('news.index') }}" class="side-nav-link">
                     <span class="menu-icon"><i class="ri-article-line"></i></span>
                     <span class="menu-text"> News </span>

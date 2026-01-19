@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\NewsController;
+use App\Http\Controllers\ProjectRequestController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
@@ -22,6 +23,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('clients', ClientController::class);
     Route::resource('projects', ProjectController::class);
     Route::resource('news', NewsController::class);
+    Route::resource('project-requests', ProjectRequestController::class)->only(['index', 'show', 'update', 'destroy']);
     Route::resource('users', UserController::class)->except(['show']);
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
