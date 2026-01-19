@@ -4,6 +4,7 @@
 <head>
     @include('partials.title-meta')
     @include('partials.head-css')
+    @stack('styles')
 </head>
 
 <body>
