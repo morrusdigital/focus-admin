@@ -21,6 +21,7 @@ class FeaturedProject extends Model
         'description',
         'image',
         'size',
+        'sort_order',
     ];
 
     public function getImageUrlAttribute(): string

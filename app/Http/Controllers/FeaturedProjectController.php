@@ -14,7 +14,10 @@ class FeaturedProjectController extends Controller
      */
     public function index()
     {
-        $projects = FeaturedProject::orderBy('id')->get();
+        $projects = FeaturedProject::orderByRaw('case when sort_order is null then 1 else 0 end')
+            ->orderBy('sort_order')
+            ->orderByDesc('created_at')
+            ->get();
 
         return view('featured-projects.index', [
             'projects' => $projects,
@@ -43,6 +46,10 @@ class FeaturedProjectController extends Controller
         $validated = $request->validate($this->storeRules());
 
         $validated['image'] = $request->file('image')->store('featured-projects', 'public');
+        $validated['sort_order'] = $this->normalizeSortOrder($request->input('sort_order'));
+        if ($validated['sort_order'] === null) {
+            $validated['sort_order'] = $this->nextSortOrder();
+        }
 
         FeaturedProject::create($validated);
 
@@ -89,6 +96,10 @@ class FeaturedProjectController extends Controller
             unset($validated['image']);
         }
 
+        if ($request->has('sort_order')) {
+            $validated['sort_order'] = $this->normalizeSortOrder($request->input('sort_order'));
+        }
+
         $featuredProject->update($validated);
 
         return redirect()
@@ -109,6 +120,20 @@ class FeaturedProjectController extends Controller
             ->with('success', 'Project deleted.');
     }
 
+    public function reorder(Request $request)
+    {
+        $validated = $request->validate([
+            'order' => ['required', 'array'],
+            'order.*' => ['integer', 'exists:featured_projects,id'],
+        ]);
+
+        foreach ($validated['order'] as $index => $id) {
+            FeaturedProject::where('id', $id)->update(['sort_order' => $index + 1]);
+        }
+
+        return response()->json(['message' => 'OK']);
+    }
+
     private function storeRules(): array
     {
         return [
@@ -117,6 +142,7 @@ class FeaturedProjectController extends Controller
             'description' => ['required', 'string'],
             'image' => ['required', 'image', 'max:2048'],
             'size' => ['required', 'string', 'max:255'],
+            'sort_order' => ['nullable', 'integer'],
         ];
     }
 
@@ -128,7 +154,22 @@ class FeaturedProjectController extends Controller
             'description' => ['required', 'string'],
             'image' => ['nullable', 'image', 'max:2048'],
             'size' => ['required', 'string', 'max:255'],
+            'sort_order' => ['nullable', 'integer'],
         ];
+    }
+
+    private function normalizeSortOrder(?string $value): ?int
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        return (int) $value;
+    }
+
+    private function nextSortOrder(): int
+    {
+        return (int) (FeaturedProject::max('sort_order') ?? 0) + 1;
     }
 
     private function deleteImageIfLocal(?string $image): void

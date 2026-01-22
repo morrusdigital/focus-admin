@@ -45,6 +45,19 @@
 </div>
 
 <div class="mb-3">
+    <label class="form-label" for="sort_order">Sort Order</label>
+    <input
+        class="form-control"
+        id="sort_order"
+        name="sort_order"
+        type="number"
+        min="1"
+        value="{{ old('sort_order', $project->sort_order ?? '') }}"
+        placeholder="Auto"
+    >
+</div>
+
+<div class="mb-3">
     <label class="form-label" for="image">Image</label>
     <input
         class="form-control"

@@ -12,7 +12,10 @@ class FeaturedProjectController extends Controller
 {
     public function index()
     {
-        $projects = FeaturedProject::orderBy('id')->get();
+        $projects = FeaturedProject::orderByRaw('case when sort_order is null then 1 else 0 end')
+            ->orderBy('sort_order')
+            ->orderByDesc('created_at')
+            ->get();
 
         return response()->json([
             'data' => $projects,
@@ -25,6 +28,10 @@ class FeaturedProjectController extends Controller
 
         if ($request->hasFile('image')) {
             $validated['image'] = $request->file('image')->store('featured-projects', 'public');
+        }
+        $validated['sort_order'] = $this->normalizeSortOrder($request->input('sort_order'));
+        if ($validated['sort_order'] === null) {
+            $validated['sort_order'] = $this->nextSortOrder();
         }
 
         $project = FeaturedProject::create($validated);
@@ -49,6 +56,9 @@ class FeaturedProjectController extends Controller
             $this->deleteImageIfLocal($featuredProject->image);
             $validated['image'] = $request->file('image')->store('featured-projects', 'public');
         }
+        if ($request->has('sort_order')) {
+            $validated['sort_order'] = $this->normalizeSortOrder($request->input('sort_order'));
+        }
 
         $featuredProject->update($validated);
 
@@ -72,6 +82,7 @@ class FeaturedProjectController extends Controller
             'scope' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
             'size' => ['required', 'string', 'max:255'],
+            'sort_order' => ['nullable', 'integer'],
         ];
 
         if ($request->hasFile('image')) {
@@ -90,6 +101,7 @@ class FeaturedProjectController extends Controller
             'scope' => ['sometimes', 'required', 'string', 'max:255'],
             'description' => ['sometimes', 'required', 'string'],
             'size' => ['sometimes', 'required', 'string', 'max:255'],
+            'sort_order' => ['nullable', 'integer'],
         ];
 
         if ($request->hasFile('image')) {
@@ -112,5 +124,19 @@ class FeaturedProjectController extends Controller
         }
 
         Storage::disk('public')->delete($image);
+    }
+
+    private function normalizeSortOrder(?string $value): ?int
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        return (int) $value;
+    }
+
+    private function nextSortOrder(): int
+    {
+        return (int) (FeaturedProject::max('sort_order') ?? 0) + 1;
     }
 }

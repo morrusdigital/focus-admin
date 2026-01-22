@@ -22,6 +22,7 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::resource('featured-projects', FeaturedProjectController::class);
+    Route::post('featured-projects/reorder', [FeaturedProjectController::class, 'reorder'])->name('featured-projects.reorder');
     Route::resource('clients', ClientController::class);
     Route::resource('projects', ProjectController::class);
     Route::resource('news', NewsController::class);

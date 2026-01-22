@@ -14,6 +14,7 @@
                     <p class="text-muted mb-3">{{ $project->description }}</p>
                     <div class="mb-2"><strong>Scope:</strong> {{ $project->scope }}</div>
                     <div class="mb-2"><strong>Size:</strong> {{ $project->size }}</div>
+                    <div class="mb-2"><strong>Sort Order:</strong> {{ $project->sort_order ?? '-' }}</div>
                     <div class="mb-2">
                         <strong>Image:</strong>
                         <a href="{{ $project->image_url }}" target="_blank" rel="noopener">{{ $project->image_url }}</a>

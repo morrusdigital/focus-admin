@@ -22,6 +22,7 @@ class FeaturedProjectSeeder extends Seeder
                 'description' => 'Pekerjaan infrastruktur menyeluruh untuk kawasan resort',
                 'image' => '/images/hero/sampoerna.webp',
                 'size' => '> 15.000 m²',
+                'sort_order' => 1,
             ],
             [
                 'title' => 'Konstruksi Baja',
@@ -29,6 +30,7 @@ class FeaturedProjectSeeder extends Seeder
                 'description' => 'Pekerjaan struktur baja untuk fasilitas industri',
                 'image' => 'https://mandorpro.id/wp-content/uploads/2024/07/harga-borongan-baja-1.webp',
                 'size' => '± 5.000 m²',
+                'sort_order' => 2,
             ],
             [
                 'title' => 'Proyek PEMKOT Surabaya',
@@ -36,6 +38,7 @@ class FeaturedProjectSeeder extends Seeder
                 'description' => 'Paket pekerjaan infrastruktur untuk Pemerintah Kota Surabaya',
                 'image' => 'https://asiacon.co.id/wp-content/uploads/2024/12/Efisiensi-Biaya-dengan-Menggunakan-U-Ditch-Beton-dalam-Proyek-Konstruksi-1_11zon-1.jpg',
                 'size' => '± 12.000 m²',
+                'sort_order' => 3,
             ],
             [
                 'title' => 'Icon Mall Gresik',
@@ -43,6 +46,7 @@ class FeaturedProjectSeeder extends Seeder
                 'description' => 'Pekerjaan finishing area komersial pusat perbelanjaan',
                 'image' => 'https://www.rumah123.com/seo-cms/assets/large_Perpaduan_Konsep_Natural_dan_Futuristik_285437ee5c/large_Perpaduan_Konsep_Natural_dan_Futuristik_285437ee5c.png',
                 'size' => '± 8.000 m²',
+                'sort_order' => 4,
             ],
             [
                 'title' => 'PT. Hertz Flavors Makmur Indonesia',
@@ -50,6 +54,7 @@ class FeaturedProjectSeeder extends Seeder
                 'description' => 'Pekerjaan rancang bangun fasilitas kantor',
                 'image' => 'https://tobaccoreporter.com/wp-content/uploads/2023/11/OUTSIDE-FACTORY.jpg',
                 'size' => '± 6.000 m²',
+                'sort_order' => 5,
             ],
         ]);
     }
