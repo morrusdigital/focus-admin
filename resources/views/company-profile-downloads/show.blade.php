@@ -10,6 +10,7 @@
         <div class="card-body">
             <h5 class="mb-2">{{ $download->name }}</h5>
             <div class="mb-2"><strong>Phone:</strong> {{ $download->phone }}</div>
+            <div class="mb-2"><strong>Company Phone:</strong> {{ $download->company_phone ?? '-' }}</div>
             <div class="mb-2"><strong>Domicile:</strong> {{ $download->domicile }}</div>
             <div class="mb-2"><strong>IP Address:</strong> {{ $download->ip_address ?? '-' }}</div>
             <div class="mb-2"><strong>User Agent:</strong> {{ $download->user_agent ?? '-' }}</div>

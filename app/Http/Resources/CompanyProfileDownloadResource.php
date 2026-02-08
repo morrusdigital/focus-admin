@@ -18,6 +18,7 @@ class CompanyProfileDownloadResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'phone' => $this->phone,
+            'company_phone' => $this->company_phone,
             'domicile' => $this->domicile,
             'ip_address' => $this->ip_address,
             'user_agent' => $this->user_agent,

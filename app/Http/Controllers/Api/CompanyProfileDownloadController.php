@@ -7,6 +7,8 @@ use App\Http\Resources\CompanyProfileDownloadResource;
 use App\Models\CompanyProfileDownload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
+use Throwable;
 
 class CompanyProfileDownloadController extends Controller
 {
@@ -46,23 +48,37 @@ class CompanyProfileDownloadController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate($this->storeRules());
+        $validator = Validator::make($request->all(), $this->storeRules());
 
-        $download = CompanyProfileDownload::create([
-            'name' => $validated['name'],
-            'phone' => $validated['phone'],
-            'domicile' => $validated['domicile'],
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-            'downloaded_at' => now(),
-        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => $validator->errors()->first() ?? 'Invalid request.',
+            ], 422);
+        }
+
+        $validated = $validator->validated();
+
+        try {
+            CompanyProfileDownload::create([
+                'name' => $validated['name'],
+                'phone' => $validated['phone'],
+                'company_phone' => $validated['company_phone'] ?? null,
+                'domicile' => $validated['domicile'],
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'downloaded_at' => now(),
+            ]);
+        } catch (Throwable $e) {
+            return response()->json([
+                'message' => 'Failed to process request. Please try again.',
+            ], 400);
+        }
 
         $downloadUrl = Storage::disk('public')->url('company-profile.pdf');
 
         return response()->json([
-            'message' => 'OK',
             'download_url' => $downloadUrl,
-        ], 201);
+        ], 200);
     }
 
     public function show(CompanyProfileDownload $companyProfileDownload)
@@ -82,6 +98,7 @@ class CompanyProfileDownloadController extends Controller
         return [
             'name' => ['required', 'string', 'min:2', 'max:255'],
             'phone' => ['required', 'regex:/^[0-9]{10,15}$/'],
+            'company_phone' => ['nullable', 'string', 'max:255'],
             'domicile' => ['required', 'string', 'max:255'],
         ];
     }

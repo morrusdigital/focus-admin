@@ -9,7 +9,6 @@ use App\Http\Controllers\NewsController;
 use App\Http\Controllers\ProjectRequestController;
 use App\Http\Controllers\CompanyProfileDownloadController;
 use App\Http\Controllers\CompanyProfileController;
-use App\Http\Controllers\FeaturedWorkController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
@@ -24,7 +23,6 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('featured-projects', FeaturedProjectController::class);
     Route::post('featured-projects/reorder', [FeaturedProjectController::class, 'reorder'])->name('featured-projects.reorder');
-    Route::resource('featured-works', FeaturedWorkController::class);
     Route::resource('clients', ClientController::class);
     Route::resource('projects', ProjectController::class);
     Route::resource('news', NewsController::class);

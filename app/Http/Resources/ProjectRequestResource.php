@@ -19,6 +19,7 @@ class ProjectRequestResource extends JsonResource
             'name' => $this->name,
             'company' => $this->company,
             'email' => $this->email,
+            'phone' => $this->phone,
             'project_location' => $this->project_location,
             'area_estimate' => $this->area_estimate,
             'timeline' => $this->timeline,

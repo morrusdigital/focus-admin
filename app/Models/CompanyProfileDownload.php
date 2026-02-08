@@ -9,6 +9,7 @@ class CompanyProfileDownload extends Model
     protected $fillable = [
         'name',
         'phone',
+        'company_phone',
         'domicile',
         'ip_address',
         'user_agent',

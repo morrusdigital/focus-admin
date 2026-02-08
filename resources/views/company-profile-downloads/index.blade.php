@@ -40,6 +40,7 @@
                         <tr>
                             <th>Name</th>
                             <th>Phone</th>
+                            <th>Company Phone</th>
                             <th>Domicile</th>
                             <th>Downloaded At</th>
                             <th class="text-end">Actions</th>
@@ -50,6 +51,7 @@
                             <tr>
                                 <td>{{ $download->name }}</td>
                                 <td>{{ $download->phone }}</td>
+                                <td>{{ $download->company_phone ?? '-' }}</td>
                                 <td>{{ $download->domicile }}</td>
                                 <td>{{ $download->downloaded_at?->format('Y-m-d H:i') ?? '-' }}</td>
                                 <td class="text-end">
@@ -63,7 +65,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="text-center text-muted">No downloads yet.</td>
+                                <td colspan="6" class="text-center text-muted">No downloads yet.</td>
                             </tr>
                         @endforelse
                     </tbody>

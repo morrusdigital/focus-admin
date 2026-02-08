@@ -7,8 +7,10 @@ use App\Http\Resources\ProjectRequestResource;
 use App\Models\ProjectRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Throwable;
 
 class ProjectRequestController extends Controller
 {
@@ -46,16 +48,33 @@ class ProjectRequestController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate($this->storeRules());
+        $validator = Validator::make($request->all(), $this->storeRules());
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Gagal mengirim permintaan. Coba lagi.',
+            ], 422);
+        }
+
+        $validated = $validator->validated();
         $validated['project_images'] = $this->storeImages($request->file('project_images', []));
         $validated['status'] = 'new';
+        $validated['company'] = $validated['company'] ?? '';
+        $validated['email'] = $validated['email'] ?? '';
+        $validated['project_description'] = $validated['project_description'] ?? '';
+        $validated['timeline'] = $validated['timeline'] ?? '';
 
-        $projectRequest = ProjectRequest::create($validated);
+        try {
+            ProjectRequest::create($validated);
+        } catch (Throwable $e) {
+            return response()->json([
+                'message' => 'Gagal mengirim permintaan. Coba lagi.',
+            ], 400);
+        }
 
         return response()->json([
-            'message' => 'OK',
-            'data' => (new ProjectRequestResource($projectRequest))->resolve(),
-        ], 201);
+            'message' => 'Terima kasih! Permintaan Anda sudah kami terima.',
+        ], 200);
     }
 
     public function show(ProjectRequest $projectRequest)
@@ -84,14 +103,15 @@ class ProjectRequestController extends Controller
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'company' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255'],
+            'company' => ['nullable', 'string', 'max:255'],
+            'email' => ['nullable', 'email', 'max:255'],
+            'phone' => ['required', 'digits_between:10,15'],
             'project_location' => ['required', 'string', 'max:255'],
-            'area_estimate' => ['required', 'string', 'max:255'],
-            'timeline' => ['required', 'string', 'max:255'],
-            'project_description' => ['required', 'string'],
+            'area_estimate' => ['required', 'string', 'max:255', 'regex:/^\d+$/'],
+            'timeline' => ['nullable', 'string', 'max:255'],
+            'project_description' => ['nullable', 'string'],
             'project_images' => ['nullable', 'array', 'max:5'],
-            'project_images.*' => ['image', 'max:5120'],
+            'project_images.*' => ['file', 'mimes:jpg,jpeg,png,pdf,dwg,dxf', 'max:5120'],
         ];
     }
 

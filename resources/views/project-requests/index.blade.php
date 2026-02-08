@@ -42,6 +42,7 @@
                             <th>Name</th>
                             <th>Company</th>
                             <th>Email</th>
+                            <th>Phone</th>
                             <th>Location</th>
                             <th>Status</th>
                             <th>Created</th>
@@ -54,6 +55,7 @@
                                 <td>{{ $projectRequest->name }}</td>
                                 <td>{{ $projectRequest->company }}</td>
                                 <td>{{ $projectRequest->email }}</td>
+                                <td>{{ $projectRequest->phone ?? '-' }}</td>
                                 <td>{{ $projectRequest->project_location }}</td>
                                 <td>
                                     @if ($projectRequest->status === 'done')
@@ -76,7 +78,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="text-center text-muted">No requests yet.</td>
+                                <td colspan="8" class="text-center text-muted">No requests yet.</td>
                             </tr>
                         @endforelse
                     </tbody>

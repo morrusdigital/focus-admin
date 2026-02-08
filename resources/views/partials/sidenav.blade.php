@@ -35,12 +35,6 @@
                 </a>
             </li>
             <li class="side-nav-item">
-                <a href="{{ route('featured-works.index') }}" class="side-nav-link">
-                    <span class="menu-icon"><i class="ri-briefcase-line"></i></span>
-                    <span class="menu-text"> Featured Work </span>
-                </a>
-            </li>
-            <li class="side-nav-item">
                 <a href="{{ route('projects.index') }}" class="side-nav-link">
                     <span class="menu-icon"><i class="ri-building-4-line"></i></span>
                     <span class="menu-text"> Projects </span>

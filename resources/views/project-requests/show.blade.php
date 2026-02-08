@@ -15,13 +15,14 @@
             <div class="row">
                 <div class="col-lg-8">
                     <h5 class="mb-2">{{ $projectRequest->name }}</h5>
-                    <div class="mb-2"><strong>Company:</strong> {{ $projectRequest->company }}</div>
-                    <div class="mb-2"><strong>Email:</strong> {{ $projectRequest->email }}</div>
+                    <div class="mb-2"><strong>Company:</strong> {{ $projectRequest->company ?: '-' }}</div>
+                    <div class="mb-2"><strong>Email:</strong> {{ $projectRequest->email ?: '-' }}</div>
+                    <div class="mb-2"><strong>Phone:</strong> {{ $projectRequest->phone ?: '-' }}</div>
                     <div class="mb-2"><strong>Location:</strong> {{ $projectRequest->project_location }}</div>
                     <div class="mb-2"><strong>Area Estimate:</strong> {{ $projectRequest->area_estimate }}</div>
-                    <div class="mb-2"><strong>Timeline:</strong> {{ $projectRequest->timeline }}</div>
+                    <div class="mb-2"><strong>Timeline:</strong> {{ $projectRequest->timeline ?: '-' }}</div>
                     <div class="mb-2"><strong>Description:</strong></div>
-                    <p class="text-muted">{{ $projectRequest->project_description }}</p>
+                    <p class="text-muted">{{ $projectRequest->project_description ?: '-' }}</p>
                     <div class="mb-2">
                         <strong>Status:</strong>
                         @if ($projectRequest->status === 'done')
@@ -39,9 +40,18 @@
                     @if (!empty($projectRequest->project_images_urls))
                         <div class="row g-2">
                             @foreach ($projectRequest->project_images_urls as $imageUrl)
+                                @php
+                                    $path = parse_url($imageUrl, PHP_URL_PATH) ?? '';
+                                    $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+                                    $fileName = basename($path) ?: 'File';
+                                @endphp
                                 <div class="col-6">
-                                    <a href="{{ $imageUrl }}" target="_blank" rel="noopener">
-                                        <img class="img-fluid rounded" src="{{ $imageUrl }}" alt="{{ $projectRequest->name }}">
+                                    <a href="{{ $imageUrl }}" target="_blank" rel="noopener" class="d-block">
+                                        @if (in_array($extension, ['jpg', 'jpeg', 'png'], true))
+                                            <img class="img-fluid rounded" src="{{ $imageUrl }}" alt="{{ $projectRequest->name }}">
+                                        @else
+                                            <div class="border rounded p-2 text-truncate">{{ $fileName }}</div>
+                                        @endif
                                     </a>
                                 </div>
                             @endforeach

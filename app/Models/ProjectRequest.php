@@ -12,6 +12,7 @@ class ProjectRequest extends Model
         'name',
         'company',
         'email',
+        'phone',
         'project_location',
         'area_estimate',
         'timeline',
