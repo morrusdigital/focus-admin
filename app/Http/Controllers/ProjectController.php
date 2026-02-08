@@ -16,7 +16,6 @@ class ProjectController extends Controller
     public function index()
     {
         $projects = Project::with('images')
-            ->orderBy('sort_order')
             ->orderByDesc('created_at')
             ->get();
 
@@ -45,7 +44,6 @@ class ProjectController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate($this->storeRules());
-        $validated['sort_order'] = $this->normalizeSortOrder($request->input('sort_order'));
         $validated['is_active'] = $request->boolean('is_active');
 
         $project = Project::create($validated);
@@ -91,7 +89,6 @@ class ProjectController extends Controller
     {
         $validated = $request->validate($this->updateRules());
 
-        $validated['sort_order'] = $this->normalizeSortOrder($request->input('sort_order'));
         $validated['is_active'] = $request->boolean('is_active');
 
         $project->update($validated);
@@ -123,11 +120,6 @@ class ProjectController extends Controller
         return [
             'title' => ['required', 'string', 'max:255'],
             'sector' => ['required', 'string', 'max:255'],
-            'location' => ['required', 'string', 'max:255'],
-            'status' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string'],
-            'badge' => ['required', 'string', 'max:255'],
-            'sort_order' => ['nullable', 'integer'],
             'is_active' => ['nullable', 'boolean'],
             'images' => ['required', 'array', 'min:1'],
             'images.*' => ['image', 'max:2048'],
@@ -139,26 +131,12 @@ class ProjectController extends Controller
         return [
             'title' => ['required', 'string', 'max:255'],
             'sector' => ['required', 'string', 'max:255'],
-            'location' => ['required', 'string', 'max:255'],
-            'status' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string'],
-            'badge' => ['required', 'string', 'max:255'],
-            'sort_order' => ['nullable', 'integer'],
             'is_active' => ['nullable', 'boolean'],
             'images' => ['nullable', 'array'],
             'images.*' => ['image', 'max:2048'],
             'remove_image_ids' => ['nullable', 'array'],
             'remove_image_ids.*' => ['integer'],
         ];
-    }
-
-    private function normalizeSortOrder(?string $value): ?int
-    {
-        if ($value === null || $value === '') {
-            return null;
-        }
-
-        return (int) $value;
     }
 
     private function storeImages(Project $project, array $files): void

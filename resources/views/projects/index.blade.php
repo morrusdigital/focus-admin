@@ -19,10 +19,6 @@
                             <th>Image</th>
                             <th>Title</th>
                             <th>Sector</th>
-                            <th>Status</th>
-                            <th>Location</th>
-                            <th>Badge</th>
-                            <th>Sort</th>
                             <th>Active</th>
                             <th class="text-end">Actions</th>
                         </tr>
@@ -42,10 +38,6 @@
                                 </td>
                                 <td>{{ $project->title }}</td>
                                 <td>{{ $project->sector }}</td>
-                                <td>{{ $project->status }}</td>
-                                <td>{{ $project->location }}</td>
-                                <td>{{ $project->badge }}</td>
-                                <td>{{ $project->sort_order ?? '-' }}</td>
                                 <td>
                                     @if ($project->is_active)
                                         <span class="badge bg-success">Active</span>
@@ -65,7 +57,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="9" class="text-center text-muted">No projects yet.</td>
+                                <td colspan="5" class="text-center text-muted">No projects yet.</td>
                             </tr>
                         @endforelse
                     </tbody>

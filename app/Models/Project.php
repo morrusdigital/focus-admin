@@ -13,11 +13,6 @@ class Project extends Model
     protected $fillable = [
         'title',
         'sector',
-        'location',
-        'status',
-        'description',
-        'badge',
-        'sort_order',
         'is_active',
     ];
 

@@ -20,99 +20,38 @@
     >
 </div>
 
-<div class="row">
-    <div class="col-md-6 mb-3">
-        <label class="form-label" for="sector">Sector</label>
-        <input
-            class="form-control"
-            id="sector"
-            name="sector"
-            type="text"
-            value="{{ old('sector', $project->sector ?? '') }}"
-            required
-        >
-    </div>
-    <div class="col-md-6 mb-3">
-        <label class="form-label" for="project_status">Status</label>
-        <input
-            class="form-control"
-            id="project_status"
-            name="status"
-            type="text"
-            value="{{ old('status', $project->status ?? '') }}"
-            required
-        >
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-md-6 mb-3">
-        <label class="form-label" for="location">Location</label>
-        <input
-            class="form-control"
-            id="location"
-            name="location"
-            type="text"
-            value="{{ old('location', $project->location ?? '') }}"
-            required
-        >
-    </div>
-    <div class="col-md-6 mb-3">
-        <label class="form-label" for="badge">Badge</label>
-        <input
-            class="form-control"
-            id="badge"
-            name="badge"
-            type="text"
-            value="{{ old('badge', $project->badge ?? '') }}"
-            required
-        >
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-md-6 mb-3">
-        <label class="form-label" for="sort_order">Sort Order</label>
-        <input
-            class="form-control"
-            id="sort_order"
-            name="sort_order"
-            type="number"
-            value="{{ old('sort_order', $project->sort_order ?? '') }}"
-        >
-    </div>
-    <div class="col-md-6 mb-3">
-        <label class="form-label" for="images">Images</label>
-        <div id="project-images-inputs" class="d-flex flex-column gap-2">
-            <input
-                class="form-control project-images-input"
-                id="images"
-                name="images[]"
-                type="file"
-                accept="image/*"
-                multiple
-                @if (empty($project->images) || $project->images->isEmpty()) required @endif
-            >
-        </div>
-        <div class="d-flex align-items-center gap-2 mt-2">
-            <button class="btn btn-outline-secondary btn-sm" type="button" id="add-project-image">
-                + Add Image
-            </button>
-            <small class="text-muted">Max 2MB per image.</small>
-        </div>
-        <div id="project-images-preview" class="row g-2 mt-2"></div>
-    </div>
+<div class="mb-3">
+    <label class="form-label" for="sector">Sector</label>
+    <input
+        class="form-control"
+        id="sector"
+        name="sector"
+        type="text"
+        value="{{ old('sector', $project->sector ?? '') }}"
+        required
+    >
 </div>
 
 <div class="mb-3">
-    <label class="form-label" for="description">Description</label>
-    <textarea
-        class="form-control"
-        id="description"
-        name="description"
-        rows="4"
-        required
-    >{{ old('description', $project->description ?? '') }}</textarea>
+    <label class="form-label" for="images">Images</label>
+    <div id="project-images-inputs" class="d-flex flex-column gap-2">
+        <input
+            class="form-control project-images-input"
+            id="images"
+            name="images[]"
+            type="file"
+            accept="image/*"
+            multiple
+            @if (empty($project->images) || $project->images->isEmpty()) required @endif
+        >
+    </div>
+    <div class="d-flex align-items-center gap-2 mt-2">
+        <button class="btn btn-outline-secondary btn-sm" type="button" id="add-project-image">
+            + Add Image
+        </button>
+        <small class="text-muted">Max 2MB per image.</small>
+    </div>
+    <div id="project-images-preview" class="row g-2 mt-2"></div>
 </div>
 
 @php

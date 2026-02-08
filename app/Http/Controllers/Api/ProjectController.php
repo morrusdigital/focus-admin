@@ -7,18 +7,43 @@ use App\Models\Project;
 use App\Models\ProjectImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 class ProjectController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $validator = Validator::make($request->query(), [
+            'sector' => ['sometimes', 'filled', 'string', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/'],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => $validator->errors()->first() ?? 'Invalid request.',
+            ], 422);
+        }
+
+        $sector = $validator->validated()['sector'] ?? null;
+
+        if ($sector) {
+            $isValidSector = Project::query()
+                ->where('sector', $sector)
+                ->exists();
+
+            if (!$isValidSector) {
+                return response()->json([
+                    'message' => 'Invalid sector.',
+                ], 422);
+            }
+        }
+
         $projects = Project::where('is_active', true)
+            ->when($sector, fn ($query) => $query->where('sector', $sector))
             ->with('images')
-            ->orderBy('sort_order')
             ->orderByDesc('created_at')
             ->get()
-            ->map(fn (Project $project) => $this->payload($project));
+            ->map(fn (Project $project) => $this->publicPayload($project));
 
         return response()->json([
             'data' => $projects,
@@ -29,7 +54,6 @@ class ProjectController extends Controller
     {
         $validated = $request->validate($this->storeRules());
 
-        $validated['sort_order'] = $this->normalizeSortOrder($request->input('sort_order'));
         $validated['is_active'] = $request->has('is_active')
             ? $request->boolean('is_active')
             : true;
@@ -59,10 +83,6 @@ class ProjectController extends Controller
     {
         $validated = $request->validate($this->updateRules());
 
-        if ($request->has('sort_order')) {
-            $validated['sort_order'] = $this->normalizeSortOrder($request->input('sort_order'));
-        }
-
         if ($request->has('is_active')) {
             $validated['is_active'] = $request->boolean('is_active');
         }
@@ -90,11 +110,6 @@ class ProjectController extends Controller
         return [
             'title' => ['required', 'string', 'max:255'],
             'sector' => ['required', 'string', 'max:255'],
-            'location' => ['required', 'string', 'max:255'],
-            'status' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string'],
-            'badge' => ['required', 'string', 'max:255'],
-            'sort_order' => ['nullable', 'integer'],
             'is_active' => ['nullable', 'boolean'],
             'images' => ['required', 'array', 'min:1'],
             'images.*' => ['image', 'max:2048'],
@@ -106,26 +121,12 @@ class ProjectController extends Controller
         return [
             'title' => ['required', 'string', 'max:255'],
             'sector' => ['required', 'string', 'max:255'],
-            'location' => ['required', 'string', 'max:255'],
-            'status' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string'],
-            'badge' => ['required', 'string', 'max:255'],
-            'sort_order' => ['nullable', 'integer'],
             'is_active' => ['nullable', 'boolean'],
             'images' => ['nullable', 'array'],
             'images.*' => ['image', 'max:2048'],
             'remove_image_ids' => ['nullable', 'array'],
             'remove_image_ids.*' => ['integer'],
         ];
-    }
-
-    private function normalizeSortOrder(?string $value): ?int
-    {
-        if ($value === null || $value === '') {
-            return null;
-        }
-
-        return (int) $value;
     }
 
     private function storeImages(Project $project, array $files): void
@@ -192,17 +193,32 @@ class ProjectController extends Controller
             'id' => $project->id,
             'title' => $project->title,
             'sector' => $project->sector,
-            'location' => $project->location,
-            'status' => $project->status,
-            'description' => $project->description,
-            'badge' => $project->badge,
-            'sort_order' => $project->sort_order,
             'is_active' => (bool) $project->is_active,
             'images' => $project->images->map(function (ProjectImage $image) {
                 return [
                     'id' => $image->id,
                     'image' => $image->image,
                     'image_url' => $image->image_url,
+                    'sort_order' => $image->sort_order,
+                ];
+            })->all(),
+        ];
+    }
+
+    private function publicPayload(Project $project): array
+    {
+        $project->loadMissing('images');
+
+        return [
+            'id' => $project->id,
+            'title' => $project->title,
+            'sector' => $project->sector,
+            'is_active' => (bool) $project->is_active,
+            'images' => $project->images->map(function (ProjectImage $image) {
+                return [
+                    'id' => $image->id,
+                    'image_url' => $image->image_url,
+                    'image' => $image->image,
                     'sort_order' => $image->sort_order,
                 ];
             })->all(),

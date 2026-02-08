@@ -11,12 +11,7 @@
             <div class="row">
                 <div class="col-lg-8">
                     <h5 class="mb-2">{{ $project->title }}</h5>
-                    <p class="text-muted mb-3">{{ $project->description }}</p>
                     <div class="mb-2"><strong>Sector:</strong> {{ $project->sector }}</div>
-                    <div class="mb-2"><strong>Status:</strong> {{ $project->status }}</div>
-                    <div class="mb-2"><strong>Location:</strong> {{ $project->location }}</div>
-                    <div class="mb-2"><strong>Badge:</strong> {{ $project->badge }}</div>
-                    <div class="mb-2"><strong>Sort Order:</strong> {{ $project->sort_order ?? '-' }}</div>
                     <div class="mb-2">
                         <strong>Active:</strong>
                         @if ($project->is_active)
