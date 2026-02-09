@@ -17,6 +17,7 @@ class ProjectController extends Controller
     public function index(Request $request)
     {
         $sector = trim((string) $request->query('sector', ''));
+        $search = trim((string) $request->query('search', ''));
 
         $sectors = Sector::orderByRaw('case when sort_order is null then 1 else 0 end')
             ->orderBy('sort_order')
@@ -27,12 +28,14 @@ class ProjectController extends Controller
             ->when($sector !== '', function ($query) use ($sector) {
                 $query->whereHas('sectors', fn ($inner) => $inner->where('slug', $sector));
             })
+            ->when($search !== '', fn ($query) => $query->where('title', 'like', '%'.$search.'%'))
             ->orderByDesc('created_at')
             ->get();
 
         return view('projects.index', [
             'projects' => $projects,
             'sector' => $sector,
+            'search' => $search,
             'sectors' => $sectors,
             'title' => 'Projects',
             'subtitle' => 'Data',

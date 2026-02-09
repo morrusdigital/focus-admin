@@ -14,6 +14,10 @@
         <div class="card-body">
             <form method="GET" class="row gy-2 gx-3 align-items-end">
                 <div class="col-md-4">
+                    <label class="form-label">Search</label>
+                    <input type="text" name="search" class="form-control" placeholder="Project title" value="{{ $search }}">
+                </div>
+                <div class="col-md-4">
                     <label class="form-label">Sector</label>
                     <select name="sector" class="form-select">
                         <option value="">All</option>
@@ -24,7 +28,7 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-8">
+                <div class="col-md-4">
                     <button class="btn btn-primary" type="submit">Filter</button>
                     <a class="btn btn-outline-secondary" href="{{ route('projects.index') }}">Reset</a>
                 </div>
