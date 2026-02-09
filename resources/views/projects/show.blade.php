@@ -29,16 +29,13 @@
                     </div>
                 </div>
                 <div class="col-lg-4">
-                    @if ($project->images->isNotEmpty())
-                        <div class="row g-2">
-                            @foreach ($project->images as $image)
-                                <div class="col-6">
-                                    <a href="{{ $image->image_url }}" target="_blank" rel="noopener">
-                                        <img class="img-fluid rounded" src="{{ $image->image_url }}" alt="{{ $project->title }}">
-                                    </a>
-                                </div>
-                            @endforeach
-                        </div>
+                    @php
+                        $image = $project->images->first();
+                    @endphp
+                    @if ($image)
+                        <a href="{{ $image->image_url }}" target="_blank" rel="noopener">
+                            <img class="img-fluid rounded" src="{{ $image->image_url }}" alt="{{ $project->title }}">
+                        </a>
                     @endif
                 </div>
             </div>

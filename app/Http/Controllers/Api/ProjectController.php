@@ -63,7 +63,7 @@ class ProjectController extends Controller
 
         $project = Project::create($validated);
         $project->sectors()->sync($validated['sectors'] ?? []);
-        $this->storeImages($project, $request->file('images', []));
+        $this->storeImage($project, $request->file('image'));
 
         return response()->json([
             'data' => $this->payload($project),
@@ -93,9 +93,10 @@ class ProjectController extends Controller
 
         $project->update($validated);
         $project->sectors()->sync($validated['sectors'] ?? []);
-        $removeIds = (array) $request->input('remove_image_ids', []);
-        $this->removeImages($project, $removeIds);
-        $this->storeImages($project, $request->file('images', []));
+        if ($request->hasFile('image')) {
+            $this->deleteAllImages($project);
+            $this->storeImage($project, $request->file('image'));
+        }
 
         return response()->json([
             'data' => $this->payload($project->fresh()),
@@ -117,8 +118,7 @@ class ProjectController extends Controller
             'sectors' => ['required', 'array', 'min:1'],
             'sectors.*' => ['integer', 'exists:sectors,id'],
             'is_active' => ['nullable', 'boolean'],
-            'images' => ['required', 'array', 'min:1'],
-            'images.*' => ['image', 'max:2048'],
+            'image' => ['required', 'image', 'max:2048'],
         ];
     }
 
@@ -129,43 +129,22 @@ class ProjectController extends Controller
             'sectors' => ['required', 'array', 'min:1'],
             'sectors.*' => ['integer', 'exists:sectors,id'],
             'is_active' => ['nullable', 'boolean'],
-            'images' => ['nullable', 'array'],
-            'images.*' => ['image', 'max:2048'],
-            'remove_image_ids' => ['nullable', 'array'],
-            'remove_image_ids.*' => ['integer'],
+            'image' => ['nullable', 'image', 'max:2048'],
         ];
     }
 
-    private function storeImages(Project $project, array $files): void
+    private function storeImage(Project $project, $file): void
     {
-        if (empty($files)) {
+        if (!$file) {
             return;
         }
 
-        $currentMax = $project->images()->max('sort_order') ?? 0;
-
-        foreach ($files as $index => $file) {
-            $path = $file->store('projects', 'public');
-            ProjectImage::create([
-                'project_id' => $project->id,
-                'image' => $path,
-                'sort_order' => $currentMax + $index + 1,
-            ]);
-        }
-    }
-
-    private function removeImages(Project $project, array $removeIds): void
-    {
-        if (empty($removeIds)) {
-            return;
-        }
-
-        $images = $project->images()->whereIn('id', $removeIds)->get();
-
-        foreach ($images as $image) {
-            $this->deleteImageIfLocal($image->image);
-            $image->delete();
-        }
+        $path = $file->store('projects', 'public');
+        ProjectImage::create([
+            'project_id' => $project->id,
+            'image' => $path,
+            'sort_order' => 1,
+        ]);
     }
 
     private function deleteImageIfLocal(?string $image): void
@@ -207,7 +186,7 @@ class ProjectController extends Controller
                     'slug' => $sector->slug,
                 ];
             })->all(),
-            'images' => $project->images->map(function (ProjectImage $image) {
+            'images' => $project->images->take(1)->map(function (ProjectImage $image) {
                 return [
                     'id' => $image->id,
                     'image' => $image->image,
@@ -233,7 +212,7 @@ class ProjectController extends Controller
                     'slug' => $sector->slug,
                 ];
             })->all(),
-            'images' => $project->images->map(function (ProjectImage $image) {
+            'images' => $project->images->take(1)->map(function (ProjectImage $image) {
                 return [
                     'id' => $image->id,
                     'image_url' => $image->image_url,
