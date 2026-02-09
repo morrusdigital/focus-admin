@@ -8,6 +8,9 @@ class CompanyProfileDownload extends Model
 {
     protected $fillable = [
         'name',
+        'company_name',
+        'whatsapp',
+        'city',
         'phone',
         'company_phone',
         'domicile',

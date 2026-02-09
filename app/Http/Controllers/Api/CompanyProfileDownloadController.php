@@ -24,7 +24,8 @@ class CompanyProfileDownloadController extends Controller
             ->when($search, function ($q) use ($search) {
                 $q->where(function ($inner) use ($search) {
                     $inner->where('name', 'like', '%'.$search.'%')
-                        ->orWhere('phone', 'like', '%'.$search.'%');
+                        ->orWhere('company_name', 'like', '%'.$search.'%')
+                        ->orWhere('whatsapp', 'like', '%'.$search.'%');
                 });
             })
             ->when($dateFrom, fn ($q) => $q->whereDate('downloaded_at', '>=', $dateFrom))
@@ -61,9 +62,11 @@ class CompanyProfileDownloadController extends Controller
         try {
             CompanyProfileDownload::create([
                 'name' => $validated['name'],
-                'phone' => $validated['phone'],
-                'company_phone' => $validated['company_phone'] ?? null,
-                'domicile' => $validated['domicile'],
+                'company_name' => $validated['company_name'],
+                'whatsapp' => $validated['whatsapp'],
+                'city' => $validated['city'],
+                'phone' => $validated['whatsapp'],
+                'domicile' => $validated['city'],
                 'ip_address' => $request->ip(),
                 'user_agent' => $request->userAgent(),
                 'downloaded_at' => now(),
@@ -97,9 +100,9 @@ class CompanyProfileDownloadController extends Controller
     {
         return [
             'name' => ['required', 'string', 'min:2', 'max:255'],
-            'phone' => ['required', 'regex:/^[0-9]{10,15}$/'],
-            'company_phone' => ['nullable', 'string', 'max:255'],
-            'domicile' => ['required', 'string', 'max:255'],
+            'company_name' => ['required', 'string', 'max:255'],
+            'whatsapp' => ['required', 'regex:/^[0-9]{10,15}$/'],
+            'city' => ['required', 'string', 'max:255'],
         ];
     }
 }

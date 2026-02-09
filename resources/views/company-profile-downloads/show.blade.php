@@ -9,9 +9,9 @@
     <div class="card">
         <div class="card-body">
             <h5 class="mb-2">{{ $download->name }}</h5>
-            <div class="mb-2"><strong>Phone:</strong> {{ $download->phone }}</div>
-            <div class="mb-2"><strong>Company Phone:</strong> {{ $download->company_phone ?? '-' }}</div>
-            <div class="mb-2"><strong>Domicile:</strong> {{ $download->domicile }}</div>
+            <div class="mb-2"><strong>Company:</strong> {{ $download->company_name ?? '-' }}</div>
+            <div class="mb-2"><strong>WhatsApp:</strong> {{ $download->whatsapp ?? '-' }}</div>
+            <div class="mb-2"><strong>City:</strong> {{ $download->city ?? '-' }}</div>
             <div class="mb-2"><strong>IP Address:</strong> {{ $download->ip_address ?? '-' }}</div>
             <div class="mb-2"><strong>User Agent:</strong> {{ $download->user_agent ?? '-' }}</div>
             <div class="mb-2"><strong>Downloaded At:</strong> {{ $download->downloaded_at?->format('Y-m-d H:i') ?? '-' }}</div>

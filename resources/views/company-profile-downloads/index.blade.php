@@ -14,7 +14,7 @@
             <form method="GET" class="row gy-2 gx-3 align-items-end">
                 <div class="col-md-4">
                     <label class="form-label">Search</label>
-                    <input type="text" name="search" class="form-control" placeholder="Name or phone" value="{{ request('search') }}">
+                    <input type="text" name="search" class="form-control" placeholder="Name, company, or WhatsApp" value="{{ request('search') }}">
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">Date From</label>
@@ -39,9 +39,9 @@
                     <thead>
                         <tr>
                             <th>Name</th>
-                            <th>Phone</th>
-                            <th>Company Phone</th>
-                            <th>Domicile</th>
+                            <th>Company</th>
+                            <th>WhatsApp</th>
+                            <th>City</th>
                             <th>Downloaded At</th>
                             <th class="text-end">Actions</th>
                         </tr>
@@ -50,9 +50,9 @@
                         @forelse ($downloads as $download)
                             <tr>
                                 <td>{{ $download->name }}</td>
-                                <td>{{ $download->phone }}</td>
-                                <td>{{ $download->company_phone ?? '-' }}</td>
-                                <td>{{ $download->domicile }}</td>
+                                <td>{{ $download->company_name ?? '-' }}</td>
+                                <td>{{ $download->whatsapp ?? '-' }}</td>
+                                <td>{{ $download->city ?? '-' }}</td>
                                 <td>{{ $download->downloaded_at?->format('Y-m-d H:i') ?? '-' }}</td>
                                 <td class="text-end">
                                     <a class="btn btn-sm btn-outline-secondary" href="{{ route('company-profile-downloads.show', $download) }}">Detail</a>

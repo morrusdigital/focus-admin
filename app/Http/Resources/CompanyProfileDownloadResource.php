@@ -17,6 +17,9 @@ class CompanyProfileDownloadResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'company_name' => $this->company_name,
+            'whatsapp' => $this->whatsapp,
+            'city' => $this->city,
             'phone' => $this->phone,
             'company_phone' => $this->company_phone,
             'domicile' => $this->domicile,
