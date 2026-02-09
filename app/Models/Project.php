@@ -12,12 +12,19 @@ class Project extends Model
 
     protected $fillable = [
         'title',
-        'sector',
         'is_active',
     ];
 
     public function images()
     {
         return $this->hasMany(ProjectImage::class)->orderBy('sort_order');
+    }
+
+    public function sectors()
+    {
+        return $this->belongsToMany(Sector::class)
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->withTimestamps();
     }
 }

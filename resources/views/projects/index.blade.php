@@ -10,6 +10,28 @@
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif
 
+    <div class="card mb-3">
+        <div class="card-body">
+            <form method="GET" class="row gy-2 gx-3 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label">Sector</label>
+                    <select name="sector" class="form-select">
+                        <option value="">All</option>
+                        @foreach ($sectors as $item)
+                            <option value="{{ $item->slug }}" @selected($sector === $item->slug)>
+                                {{ $item->name }} ({{ $item->slug }})
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-8">
+                    <button class="btn btn-primary" type="submit">Filter</button>
+                    <a class="btn btn-outline-secondary" href="{{ route('projects.index') }}">Reset</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class="card">
         <div class="card-body">
             <div class="table-responsive">
@@ -18,7 +40,7 @@
                         <tr>
                             <th>Image</th>
                             <th>Title</th>
-                            <th>Sector</th>
+                            <th>Sectors</th>
                             <th>Active</th>
                             <th class="text-end">Actions</th>
                         </tr>
@@ -37,7 +59,13 @@
                                     @endif
                                 </td>
                                 <td>{{ $project->title }}</td>
-                                <td>{{ $project->sector }}</td>
+                                <td>
+                                    @forelse ($project->sectors as $sectorItem)
+                                        <span class="badge bg-light text-dark border">{{ $sectorItem->name }}</span>
+                                    @empty
+                                        <span class="text-muted">-</span>
+                                    @endforelse
+                                </td>
                                 <td>
                                     @if ($project->is_active)
                                         <span class="badge bg-success">Active</span>

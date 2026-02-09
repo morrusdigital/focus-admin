@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Project;
 use App\Models\ProjectImage;
+use App\Models\Sector;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -13,14 +14,26 @@ class ProjectController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $projects = Project::with('images')
+        $sector = trim((string) $request->query('sector', ''));
+
+        $sectors = Sector::orderByRaw('case when sort_order is null then 1 else 0 end')
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get();
+
+        $projects = Project::with(['images', 'sectors'])
+            ->when($sector !== '', function ($query) use ($sector) {
+                $query->whereHas('sectors', fn ($inner) => $inner->where('slug', $sector));
+            })
             ->orderByDesc('created_at')
             ->get();
 
         return view('projects.index', [
             'projects' => $projects,
+            'sector' => $sector,
+            'sectors' => $sectors,
             'title' => 'Projects',
             'subtitle' => 'Data',
         ]);
@@ -33,6 +46,11 @@ class ProjectController extends Controller
     {
         return view('projects.create', [
             'project' => new Project(),
+            'sectors' => Sector::orderByRaw('case when sort_order is null then 1 else 0 end')
+                ->orderBy('sort_order')
+                ->orderBy('name')
+                ->get(),
+            'selectedSectorIds' => old('sectors', []),
             'title' => 'Projects',
             'subtitle' => 'Create',
         ]);
@@ -47,6 +65,7 @@ class ProjectController extends Controller
         $validated['is_active'] = $request->boolean('is_active');
 
         $project = Project::create($validated);
+        $project->sectors()->sync($validated['sectors'] ?? []);
         $this->storeImages($project, $request->file('images', []));
 
         return redirect()
@@ -59,7 +78,7 @@ class ProjectController extends Controller
      */
     public function show(Project $project)
     {
-        $project->load('images');
+        $project->load(['images', 'sectors']);
 
         return view('projects.show', [
             'project' => $project,
@@ -73,10 +92,15 @@ class ProjectController extends Controller
      */
     public function edit(Project $project)
     {
-        $project->load('images');
+        $project->load(['images', 'sectors']);
 
         return view('projects.edit', [
             'project' => $project,
+            'sectors' => Sector::orderByRaw('case when sort_order is null then 1 else 0 end')
+                ->orderBy('sort_order')
+                ->orderBy('name')
+                ->get(),
+            'selectedSectorIds' => old('sectors', $project->sectors->pluck('id')->all()),
             'title' => 'Projects',
             'subtitle' => 'Edit',
         ]);
@@ -92,6 +116,7 @@ class ProjectController extends Controller
         $validated['is_active'] = $request->boolean('is_active');
 
         $project->update($validated);
+        $project->sectors()->sync($validated['sectors'] ?? []);
 
         $removeIds = (array) $request->input('remove_image_ids', []);
         $this->removeImages($project, $removeIds);
@@ -119,7 +144,8 @@ class ProjectController extends Controller
     {
         return [
             'title' => ['required', 'string', 'max:255'],
-            'sector' => ['required', 'string', 'max:255'],
+            'sectors' => ['required', 'array', 'min:1'],
+            'sectors.*' => ['integer', 'exists:sectors,id'],
             'is_active' => ['nullable', 'boolean'],
             'images' => ['required', 'array', 'min:1'],
             'images.*' => ['image', 'max:2048'],
@@ -130,7 +156,8 @@ class ProjectController extends Controller
     {
         return [
             'title' => ['required', 'string', 'max:255'],
-            'sector' => ['required', 'string', 'max:255'],
+            'sectors' => ['required', 'array', 'min:1'],
+            'sectors.*' => ['integer', 'exists:sectors,id'],
             'is_active' => ['nullable', 'boolean'],
             'images' => ['nullable', 'array'],
             'images.*' => ['image', 'max:2048'],

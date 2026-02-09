@@ -21,15 +21,24 @@
 </div>
 
 <div class="mb-3">
-    <label class="form-label" for="sector">Sector</label>
-    <input
-        class="form-control"
-        id="sector"
-        name="sector"
-        type="text"
-        value="{{ old('sector', $project->sector ?? '') }}"
-        required
-    >
+    <label class="form-label">Sectors</label>
+    @forelse ($sectors as $sector)
+        <div class="form-check">
+            <input
+                class="form-check-input"
+                type="checkbox"
+                id="sector_{{ $sector->id }}"
+                name="sectors[]"
+                value="{{ $sector->id }}"
+                @checked(in_array($sector->id, $selectedSectorIds))
+            >
+            <label class="form-check-label" for="sector_{{ $sector->id }}">
+                {{ $sector->name }} ({{ $sector->slug }})
+            </label>
+        </div>
+    @empty
+        <p class="text-muted mb-0">No sectors available.</p>
+    @endforelse
 </div>
 
 <div class="mb-3">

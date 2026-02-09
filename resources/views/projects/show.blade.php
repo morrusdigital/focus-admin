@@ -11,7 +11,14 @@
             <div class="row">
                 <div class="col-lg-8">
                     <h5 class="mb-2">{{ $project->title }}</h5>
-                    <div class="mb-2"><strong>Sector:</strong> {{ $project->sector }}</div>
+                    <div class="mb-2">
+                        <strong>Sectors:</strong>
+                        @forelse ($project->sectors as $sectorItem)
+                            <span class="badge bg-light text-dark border">{{ $sectorItem->name }}</span>
+                        @empty
+                            <span class="text-muted">-</span>
+                        @endforelse
+                    </div>
                     <div class="mb-2">
                         <strong>Active:</strong>
                         @if ($project->is_active)

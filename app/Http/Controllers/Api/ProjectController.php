@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Project;
 use App\Models\ProjectImage;
+use App\Models\Sector;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -27,8 +28,8 @@ class ProjectController extends Controller
         $sector = $validator->validated()['sector'] ?? null;
 
         if ($sector) {
-            $isValidSector = Project::query()
-                ->where('sector', $sector)
+            $isValidSector = Sector::query()
+                ->where('slug', $sector)
                 ->exists();
 
             if (!$isValidSector) {
@@ -39,8 +40,10 @@ class ProjectController extends Controller
         }
 
         $projects = Project::where('is_active', true)
-            ->when($sector, fn ($query) => $query->where('sector', $sector))
-            ->with('images')
+            ->when($sector, function ($query) use ($sector) {
+                $query->whereHas('sectors', fn ($inner) => $inner->where('slug', $sector));
+            })
+            ->with(['images', 'sectors'])
             ->orderByDesc('created_at')
             ->get()
             ->map(fn (Project $project) => $this->publicPayload($project));
@@ -59,6 +62,7 @@ class ProjectController extends Controller
             : true;
 
         $project = Project::create($validated);
+        $project->sectors()->sync($validated['sectors'] ?? []);
         $this->storeImages($project, $request->file('images', []));
 
         return response()->json([
@@ -72,7 +76,7 @@ class ProjectController extends Controller
             abort(404);
         }
 
-        $project->load('images');
+        $project->load(['images', 'sectors']);
 
         return response()->json([
             'data' => $this->payload($project),
@@ -88,6 +92,7 @@ class ProjectController extends Controller
         }
 
         $project->update($validated);
+        $project->sectors()->sync($validated['sectors'] ?? []);
         $removeIds = (array) $request->input('remove_image_ids', []);
         $this->removeImages($project, $removeIds);
         $this->storeImages($project, $request->file('images', []));
@@ -109,7 +114,8 @@ class ProjectController extends Controller
     {
         return [
             'title' => ['required', 'string', 'max:255'],
-            'sector' => ['required', 'string', 'max:255'],
+            'sectors' => ['required', 'array', 'min:1'],
+            'sectors.*' => ['integer', 'exists:sectors,id'],
             'is_active' => ['nullable', 'boolean'],
             'images' => ['required', 'array', 'min:1'],
             'images.*' => ['image', 'max:2048'],
@@ -120,7 +126,8 @@ class ProjectController extends Controller
     {
         return [
             'title' => ['required', 'string', 'max:255'],
-            'sector' => ['required', 'string', 'max:255'],
+            'sectors' => ['required', 'array', 'min:1'],
+            'sectors.*' => ['integer', 'exists:sectors,id'],
             'is_active' => ['nullable', 'boolean'],
             'images' => ['nullable', 'array'],
             'images.*' => ['image', 'max:2048'],
@@ -187,13 +194,19 @@ class ProjectController extends Controller
 
     private function payload(Project $project): array
     {
-        $project->loadMissing('images');
+        $project->loadMissing(['images', 'sectors']);
 
         return [
             'id' => $project->id,
             'title' => $project->title,
-            'sector' => $project->sector,
             'is_active' => (bool) $project->is_active,
+            'sectors' => $project->sectors->map(function (Sector $sector) {
+                return [
+                    'id' => $sector->id,
+                    'name' => $sector->name,
+                    'slug' => $sector->slug,
+                ];
+            })->all(),
             'images' => $project->images->map(function (ProjectImage $image) {
                 return [
                     'id' => $image->id,
@@ -207,13 +220,19 @@ class ProjectController extends Controller
 
     private function publicPayload(Project $project): array
     {
-        $project->loadMissing('images');
+        $project->loadMissing(['images', 'sectors']);
 
         return [
             'id' => $project->id,
             'title' => $project->title,
-            'sector' => $project->sector,
             'is_active' => (bool) $project->is_active,
+            'sectors' => $project->sectors->map(function (Sector $sector) {
+                return [
+                    'id' => $sector->id,
+                    'name' => $sector->name,
+                    'slug' => $sector->slug,
+                ];
+            })->all(),
             'images' => $project->images->map(function (ProjectImage $image) {
                 return [
                     'id' => $image->id,
